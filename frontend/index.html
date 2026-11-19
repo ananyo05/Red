@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RedLoop - Automated LLM Red-Teaming Testbed</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+</head>
+<body class="dark-theme">
+  <!-- Header / Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-brand">
+      <div class="brand-logo">
+        <span class="loop-icon">⟳</span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">RedLoop</span>
+        <span class="brand-tagline">Automated LLM Red-Teaming (Part 1 & 2)</span>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+      <button class="tab-btn active" data-tab="tab-overview">
+        <span class="tab-icon">ℹ</span> Overview
+      </button>
+      <button class="tab-btn" data-tab="tab-auto">
+        <span class="tab-icon">🤖</span> Auto Red-Team (Live)
+      </button>
+      <button class="tab-btn" data-tab="tab-compare">
+        <span class="tab-icon">📈</span> Human vs Auto
+      </button>
+      <button class="tab-btn" data-tab="tab-gallery">
+        <span class="tab-icon">🎯</span> Attack Gallery
+      </button>
+      <button class="tab-btn" data-tab="tab-playground">
+        <span class="tab-icon">⚡</span> Playground
+      </button>
+      <button class="tab-btn" data-tab="tab-baseline">
+        <span class="tab-icon">📊</span> Baseline Suite
+      </button>
+      <button class="tab-btn" data-tab="tab-scenarios">
+        <span class="tab-icon">📂</span> Scenarios
+      </button>
+    </nav>
+
+    <!-- System Status Badges -->
+    <div class="nav-status">
+      <div id="mock-badge" class="status-pill pill-mock" style="display: none;">
+        <span class="dot pulse-amber"></span> MOCK MODE (OFFLINE)
+      </div>
+      <div id="backend-badge" class="status-pill pill-online">
+        <span class="dot dot-green"></span> SYSTEM READY
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="main-container">
+    
+    <!-- ======================================================== -->
+    <!-- TAB 1: OVERVIEW                                          -->
+    <!-- ======================================================== -->
+    <section id="tab-overview" class="tab-content active">
+      <div class="hero-banner">
+        <div class="hero-badge">FINAL YEAR B.TECH CAPSTONE PROJECT • PART 1 & 2 COMPLETE</div>
+        <h1 class="hero-title">Automated LLM Red-Teaming & Prompt Injection Testbed</h1>
+        <p class="hero-desc">
+          <strong>RedLoop</strong> is an empirical testbed reproducing OpenAI's <em>GPT-Red</em> automated red-teaming research.
+          While GPT-Red relied on heavy reinforcement learning, <strong>Part 2 implements an in-context search, reflection, and bandit strategy-memory red-teamer</strong> that discovers prompt injections and outperforms fixed human baselines under a strictly fair query budget.
+        </p>
+      </div>
+
+      <!-- Architecture Pipeline Diagram (HTML/CSS) -->
+      <div class="card pipeline-card">
+        <div class="card-header">
+          <h2 class="card-title">System Architecture & Multi-Stage Pipeline</h2>
+          <span class="badge badge-info">Part 1 & 2 Active</span>
+        </div>
+        <div class="pipeline-container">
+          <!-- Stage 1 -->
+          <div class="pipeline-node active-stage">
+            <div class="node-tag">PART 1 (ACTIVE)</div>
+            <div class="node-icon">🎯</div>
+            <div class="node-title">Adversarial Input</div>
+            <div class="node-sub">Human Baseline (34 Templates) & Custom Injections</div>
+          </div>
+
+          <div class="pipeline-connector">➔</div>
+
+          <!-- Stage 2 -->
+          <div class="pipeline-node active-stage">
+            <div class="node-tag">PART 1 (ACTIVE)</div>
+            <div class="node-icon">🛡️</div>
+            <div class="node-title">Defender Pipeline</div>
+            <div class="node-sub">Pluggable Layers (System Warning / Boundary Isolation)</div>
+          </div>
+
+          <div class="pipeline-connector">➔</div>
+
+          <!-- Stage 3 -->
+          <div class="pipeline-node active-stage">
+            <div class="node-tag">PART 1 (ACTIVE)</div>
+            <div class="node-icon">⚖️</div>
+            <div class="node-title">Dual Judge</div>
+            <div class="node-sub">Deterministic Canary/Tool Check + LLM Judge</div>
+          </div>
+
+          <div class="pipeline-connector">➔</div>
+
+          <!-- Stage 4: Part 2 Active In-Context Red-Teamer -->
+          <div class="pipeline-node active-stage highlight-stage">
+            <div class="node-tag tag-part2">PART 2 (ACTIVE)</div>
+            <div class="node-icon">🤖</div>
+            <div class="node-title">In-Context Red-Teamer</div>
+            <div class="node-sub">Multi-Round Reflection Search + UCB Strategy Memory</div>
+          </div>
+
+          <div class="pipeline-connector connector-future">➔</div>
+
+          <!-- Stage 5: Greyed Out Future Part 3 -->
+          <div class="pipeline-node future-stage">
+            <div class="node-tag tag-future">PART 3 (UPCOMING)</div>
+            <div class="node-icon">🔄</div>
+            <div class="node-title">Self-Play Hardening</div>
+            <div class="node-sub">Iterative Adversarial DPO / Defense Distillation</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Capabilities Grid -->
+      <div class="stats-overview-grid">
+        <div class="stat-card">
+          <div class="stat-icon-wrap icon-purple">🤖</div>
+          <div class="stat-content">
+            <div class="stat-num" id="overview-auto-model">70B Versatile</div>
+            <div class="stat-label">Automated Attacker</div>
+            <div class="stat-sub">Black-box reflection loop with near-miss heuristic</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrap icon-cyan">🧠</div>
+          <div class="stat-content">
+            <div class="stat-num">UCB Bandit</div>
+            <div class="stat-label">Strategy Memory</div>
+            <div class="stat-sub">Learns effective strategies across scenario families</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrap icon-emerald">📊</div>
+          <div class="stat-content">
+            <div class="stat-num">Fair Budget</div>
+            <div class="stat-label">Rigorous Comparison</div>
+            <div class="stat-sub">ASR@1 vs ASR@N vs Human Baseline matching budget</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrap icon-amber">🔀</div>
+          <div class="stat-content">
+            <div class="stat-num">TF-IDF</div>
+            <div class="stat-label">Attack Diversity</div>
+            <div class="stat-sub">Pure-Python semantic clustering of breakthroughs</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="overview-actions">
+        <button class="btn btn-primary btn-large" onclick="switchTab('tab-auto')">
+          🤖 Launch Auto Red-Team Campaign
+        </button>
+        <button class="btn btn-secondary btn-large" onclick="switchTab('tab-compare')">
+          📈 View Human vs. Auto Benchmark
+        </button>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- TAB 2: AUTO RED-TEAM (LIVE)                              -->
+    <!-- ======================================================== -->
+    <section id="tab-auto" class="tab-content">
+      <!-- Controls Card -->
+      <div class="card">
+        <div class="card-header flex-between">
+          <div>
+            <h2 class="card-title">Automated In-Context Red-Team Campaign</h2>
+            <p class="card-subtitle">Autonomous attacker iteratively searching for prompt injection vulnerabilities with multi-round reflection.</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-outline" onclick="replayStoredCampaign()">
+              ▶ Replay Last Campaign
+            </button>
+            <button class="btn btn-secondary" onclick="exportCurrentCampaign('json')">
+              ⬇ Export JSON
+            </button>
+            <button class="btn btn-secondary" onclick="exportCurrentCampaign('csv')">
+              ⬇ Export CSV
+            </button>
+          </div>
+        </div>
+
+        <!-- Campaign Config Grid -->
+        <div class="control-grid" style="margin-top: 1rem;">
+          <div class="form-group">
+            <label for="auto-select-scenarios">Target Scenarios:</label>
+            <select id="auto-select-scenarios" class="form-select">
+              <option value="all" selected>All Scenarios (Full Testbed)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="auto-select-model">Defender Model:</label>
+            <select id="auto-select-model" class="form-select">
+              <option value="llama-3.1-8b-instant" selected>llama-3.1-8b-instant (Weak Defender)</option>
+              <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile (Strong Defender)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="auto-select-defense">Defense Layer:</label>
+            <select id="auto-select-defense" class="form-select">
+              <option value="none" selected>None (Unrestricted Baseline)</option>
+              <option value="basic_system_warning">Basic System Warning (Tag Isolation)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="auto-budget-input">Query Budget per Target (N):</label>
+            <select id="auto-budget-input" class="form-select" onchange="updateEstimatedCallsNotice()">
+              <option value="4">4 Attempts</option>
+              <option value="6" selected>6 Attempts (Standard)</option>
+              <option value="8">8 Attempts (Deep Search)</option>
+              <option value="12">12 Attempts (Exhaustive)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- API Rate Limit & Call Volume Notice -->
+        <div id="call-estimate-banner" class="estimate-call-banner">
+          <div class="estimate-icon">ℹ️</div>
+          <div class="estimate-info">
+            <span id="estimate-text">Estimated LLM queries: <strong>12 calls</strong>. Within safe rate limits.</span>
+            <span class="estimate-sub">Free tier limit: 25 requests/min. Cache & Mock mode ensure zero-waste execution.</span>
+          </div>
+          <button id="btn-start-auto" class="btn btn-danger btn-large" onclick="launchAutoCampaign(false)">
+            🚀 Start Auto Campaign
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Stream Dashboard -->
+      <div class="card">
+        <div class="card-header flex-between">
+          <div class="stream-stats">
+            <h3 class="card-title">Live Attack Stream & Reflection Log</h3>
+            <div class="stream-counters">
+              <span class="counter-pill">Attempts: <strong id="stream-attempt-count">0</strong></span>
+              <span class="counter-pill pill-success">Breakthroughs: <strong id="stream-success-count">0</strong></span>
+              <span class="counter-pill pill-info">Active Strategy: <strong id="stream-active-strategy">None</strong></span>
+            </div>
+          </div>
+          <button class="btn btn-outline" style="font-size: 0.8rem;" onclick="clearStreamLog()">
+            Clear Log
+          </button>
+        </div>
+
+        <!-- Live Cards Stream Container -->
+        <div id="stream-container" class="stream-container">
+          <div class="stream-empty-state">
+            Click <strong>"Start Auto Campaign"</strong> or <strong>"Replay Last Campaign"</strong> to watch the attacker explore strategies and reflect in real time.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- TAB 3: HUMAN VS AUTOMATED (BENCHMARK)                    -->
+    <!-- ======================================================== -->
+    <section id="tab-compare" class="tab-content">
+      <div class="card">
+        <div class="card-header flex-between">
+          <div>
+            <h2 class="card-title">Empirical Benchmark: Human Baseline vs. Automated Red-Teamer</h2>
+            <p class="card-subtitle">Fair query budget comparison proving the advantage of in-context search and strategy memory over static templates.</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-outline" onclick="loadComparisonData()">
+              🔄 Refresh Comparison
+            </button>
+          </div>
+        </div>
+
+        <!-- Comparative KPI Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-val" id="cmp-human-asr">0%</div>
+            <div class="kpi-label">Human Baseline ASR@N</div>
+          </div>
+          <div class="kpi-card kpi-info">
+            <div class="kpi-val" id="cmp-auto-asr1">0%</div>
+            <div class="kpi-label">Auto ASR@1 (First Try)</div>
+          </div>
+          <div class="kpi-card kpi-danger">
+            <div class="kpi-val" id="cmp-auto-asrn">0%</div>
+            <div class="kpi-label">Auto ASR@N (Budget N)</div>
+          </div>
+          <div class="kpi-card kpi-success">
+            <div class="kpi-val" id="cmp-asr-gain">+0%</div>
+            <div class="kpi-label">Net Autonomous Gain</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-val" id="cmp-mean-attempts">-</div>
+            <div class="kpi-label">Mean Attempts to Win</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-val" id="cmp-diversity-clusters">0</div>
+            <div class="kpi-label">Attack Diversity Clusters</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comparative Charts Row -->
+      <div class="charts-row">
+        <!-- Chart 1: Grouped Bar Chart -->
+        <div class="card chart-card">
+          <div class="card-header">
+            <h3 class="card-title">ASR by Defender Model (Fair Budget N)</h3>
+            <span class="badge badge-info">Human vs. Auto@1 vs. Auto@N</span>
+          </div>
+          <div class="chart-box">
+            <canvas id="chart-comparison-model"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 2: Cumulative Success Trajectory Curve -->
+        <div class="card chart-card">
+          <div class="card-header">
+            <h3 class="card-title">Cumulative Success Curve (Attempts 1 to N)</h3>
+            <span class="badge badge-warning">Search Efficiency</span>
+          </div>
+          <div class="chart-box">
+            <canvas id="chart-cumulative-curve"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Strategy Distribution & Attack Diversity Analysis -->
+      <div class="charts-row">
+        <!-- Chart 3: Strategy Distribution -->
+        <div class="card chart-card">
+          <div class="card-header">
+            <h3 class="card-title">Successful Attack Strategies Distribution</h3>
+            <span class="badge badge-info">Tactic Efficacy</span>
+          </div>
+          <div class="chart-box">
+            <canvas id="chart-strategy-dist"></canvas>
+          </div>
+        </div>
+
+        <!-- Diversity Clustering Summary Card -->
+        <div class="card chart-card">
+          <div class="card-header">
+            <h3 class="card-title">Semantic Attack Diversity (TF-IDF Clustering)</h3>
+            <span class="badge badge-success">Novel Breakthroughs</span>
+          </div>
+          <div id="diversity-clusters-container" class="diversity-container">
+            Loading attack clusters...
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- TAB 4: ATTACK GALLERY                                    -->
+    <!-- ======================================================== -->
+    <section id="tab-gallery" class="tab-content">
+      <div class="card">
+        <div class="card-header flex-between">
+          <div>
+            <h2 class="card-title">Successful Attack Breakthrough Gallery</h2>
+            <p class="card-subtitle">Examine confirmed prompt injections generated by the automated red-teamer across scenario targets.</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-outline" onclick="loadAttackGallery()">
+              🔄 Refresh Gallery
+            </button>
+            <button class="btn btn-secondary" onclick="resetStrategyMemoryPrompt()">
+              🗑️ Reset Strategy Memory
+            </button>
+          </div>
+        </div>
+
+        <!-- Gallery Filters -->
+        <div class="gallery-filters">
+          <div class="filter-group">
+            <label>Strategy:</label>
+            <select id="gallery-filter-strategy" class="form-select" onchange="filterAttackGallery()">
+              <option value="all">All Strategies</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Model:</label>
+            <select id="gallery-filter-model" class="form-select" onchange="filterAttackGallery()">
+              <option value="all">All Models</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gallery Grid -->
+      <div id="gallery-grid" class="gallery-grid">
+        Loading attack gallery...
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- TAB 5: PLAYGROUND (PART 1)                                -->
+    <!-- ======================================================== -->
+    <section id="tab-playground" class="tab-content">
+      <div class="playground-layout">
+        
+        <!-- Left Column: Attack Configuration & Inputs -->
+        <div class="playground-inputs">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">1. Testbed Environment Setup</h2>
+            </div>
+            
+            <div class="control-grid">
+              <div class="form-group">
+                <label for="select-scenario">Scenario Target:</label>
+                <select id="select-scenario" class="form-select">
+                  <option value="" disabled selected>Loading scenarios...</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="select-model">Defender Model:</label>
+                <select id="select-model" class="form-select">
+                  <option value="llama-3.1-8b-instant">llama-3.1-8b-instant (Weak Defender)</option>
+                  <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile (Strong Defender)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="select-defense">Defense Layer:</label>
+                <select id="select-defense" class="form-select">
+                  <option value="none">None (Unrestricted Baseline)</option>
+                  <option value="basic_system_warning">Basic System Warning (Tag Isolation)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Inspect Scenario Elements -->
+            <div class="scenario-inspector">
+              <div class="inspect-box">
+                <div class="inspect-header">
+                  <span class="inspect-title">System Prompt & Security Policies</span>
+                  <span id="target-canary-badge" class="badge badge-warning">CANARY</span>
+                </div>
+                <div id="inspect-system-prompt" class="inspect-code">Select a scenario above to inspect...</div>
+              </div>
+
+              <div class="inspect-box">
+                <div class="inspect-header">
+                  <span class="inspect-title">User Task & Untrusted Slot</span>
+                  <span id="target-goal-badge" class="badge badge-info">GOAL</span>
+                </div>
+                <div id="inspect-user-task" class="inspect-code">Task will appear here...</div>
+              </div>
+            </div>
+
+            <!-- Untrusted Document Preview with {{INJECTION}} -->
+            <div class="form-group">
+              <label>Untrusted Document Template (Injection Slot Highlighted):</label>
+              <div id="inspect-doc-preview" class="document-preview-box">
+                Select a scenario to view document...
+              </div>
+            </div>
+
+            <!-- One-Click Preset Attacks -->
+            <div class="preset-attacks-section">
+              <label>One-Click Examiner Demo Attacks:</label>
+              <div class="preset-btn-group">
+                <button type="button" class="btn btn-outline" onclick="loadPresetAttack(1)">
+                  ⚡ 1. Direct Canary Override
+                </button>
+                <button type="button" class="btn btn-outline" onclick="loadPresetAttack(2)">
+                  ⚡ 2. XML Tag Breakout
+                </button>
+                <button type="button" class="btn btn-outline" onclick="loadPresetAttack(3)">
+                  ⚡ 3. Roleplay Developer Mode
+                </button>
+              </div>
+            </div>
+
+            <!-- Custom Injection Input -->
+            <div class="form-group">
+              <label for="input-injection">Adversarial Injection Text (Inserted at {{INJECTION}}):</label>
+              <textarea id="input-injection" class="form-textarea" rows="4" placeholder="Enter adversarial payload or select a one-click preset above..."></textarea>
+            </div>
+
+            <!-- Execution Actions -->
+            <div class="action-row">
+              <button id="btn-run-attack" class="btn btn-danger btn-large" onclick="executePlaygroundAttack()">
+                <span class="btn-icon">🚀</span> Launch Injection Attack
+              </button>
+              <button type="button" class="btn btn-secondary" onclick="loadBenignText()">
+                🕊️ Test Benign Input
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Live Defender & Judge Output -->
+        <div class="playground-results">
+          <div class="card result-card">
+            <div class="card-header">
+              <h2 class="card-title">2. Live Evaluation & Verdict</h2>
+              <div id="result-meta" class="meta-tags"></div>
+            </div>
+
+            <!-- Primary Verdict Banner -->
+            <div id="verdict-banner" class="verdict-banner verdict-idle">
+              <div class="verdict-icon">⚖️</div>
+              <div class="verdict-info">
+                <div class="verdict-status">TESTBED IDLE</div>
+                <div class="verdict-reason">Select a scenario, enter an injection, and click Launch Attack.</div>
+              </div>
+            </div>
+
+            <!-- Defender LLM Output -->
+            <div class="result-section">
+              <div class="section-title">Defender Model Output:</div>
+              <div id="result-response" class="result-text-box">Awaiting execution...</div>
+            </div>
+
+            <!-- Simulated Tool Calls Output -->
+            <div class="result-section">
+              <div class="section-title">Simulated Tool Calls (Logged Side-Effects):</div>
+              <div id="result-tools" class="result-tools-box">No tools invoked.</div>
+            </div>
+
+            <!-- Technical Telemetry -->
+            <div class="telemetry-grid">
+              <div class="telemetry-item">
+                <span class="telemetry-label">Latency:</span>
+                <span id="telemetry-latency" class="telemetry-val">0.0 ms</span>
+              </div>
+              <div class="telemetry-item">
+                <span class="telemetry-label">Cache Status:</span>
+                <span id="telemetry-cache" class="telemetry-val">Miss</span>
+              </div>
+              <div class="telemetry-item">
+                <span class="telemetry-label">Judge Method:</span>
+                <span id="telemetry-judge" class="telemetry-val">Deterministic Primary</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- TAB 6: BASELINE EVALUATION (PART 1)                      -->
+    <!-- ======================================================== -->
+    <section id="tab-baseline" class="tab-content">
+      <!-- Benchmark Controls Card -->
+      <div class="card">
+        <div class="card-header flex-between">
+          <div>
+            <h2 class="card-title">Human Baseline Evaluation Suite</h2>
+            <p class="card-subtitle">Batch benchmark testing 34 human-written injection templates across all scenario families.</p>
+          </div>
+          <div class="header-actions">
+            <button id="btn-start-baseline" class="btn btn-primary" onclick="launchBatchEvaluation()">
+              ▶ Run New Evaluation
+            </button>
+            <button class="btn btn-outline" onclick="loadBaselineData()">
+              🔄 Refresh Results
+            </button>
+          </div>
+        </div>
+
+        <!-- Evaluation Progress Bar (Hidden by default) -->
+        <div id="baseline-progress-container" class="progress-wrapper" style="display: none;">
+          <div class="progress-header">
+            <span id="progress-status-text">Benchmarking in progress...</span>
+            <span id="progress-percent-text">0%</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div id="progress-bar-fill" class="progress-bar-fill" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <!-- Summary Metrics KPI Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-val" id="kpi-total">0</div>
+            <div class="kpi-label">Total Testbed Attacks</div>
+          </div>
+          <div class="kpi-card kpi-danger">
+            <div class="kpi-val" id="kpi-asr">0.0%</div>
+            <div class="kpi-label">Attack Success Rate (ASR)</div>
+          </div>
+          <div class="kpi-card kpi-success">
+            <div class="kpi-val" id="kpi-blocked">0</div>
+            <div class="kpi-label">Attacks Blocked / Defended</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-val" id="kpi-latency">0 ms</div>
+            <div class="kpi-label">Avg Execution Latency</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="charts-row">
+        <!-- Chart 1: By Model -->
+        <div class="card chart-card">
+          <div class="card-header">
+            <h3 class="card-title">ASR Comparison by Model</h3>
+            <span class="badge badge-info">Weak vs. Strong</span>
+          </div>
+          <div class="chart-box">
+            <canvas id="chart-model"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 2: By Family -->
+        <div class="card chart-card">
+          <div class="card-header">
+            <h3 class="card-title">Vulnerability by Scenario Family</h3>
+            <span class="badge badge-info">Agent Contexts</span>
+          </div>
+          <div class="chart-box">
+            <canvas id="chart-family"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart 3: By Attack Category -->
+      <div class="card chart-card">
+        <div class="card-header">
+          <h3 class="card-title">Attack Success Rate by Injection Category</h3>
+          <span class="badge badge-warning">Adversarial Tactics</span>
+        </div>
+        <div class="chart-box chart-box-wide">
+          <canvas id="chart-category"></canvas>
+        </div>
+      </div>
+
+      <!-- Raw Attempts Table -->
+      <div class="card">
+        <div class="card-header flex-between">
+          <h3 class="card-title">Detailed Attack Attempts Log</h3>
+          <div class="table-search">
+            <input type="text" id="table-search-input" class="form-input" placeholder="Search attacks by scenario, model, or status..." oninput="filterAttemptsTable()">
+          </div>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Verdict</th>
+                <th>Scenario</th>
+                <th>Model</th>
+                <th>Defense</th>
+                <th>Category</th>
+                <th>Latency</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="attempts-tbody">
+              <tr>
+                <td colspan="7" class="text-center py-4">Loading benchmark attempts...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- TAB 7: SCENARIOS GALLERY (PART 1)                        -->
+    <!-- ======================================================== -->
+    <section id="tab-scenarios" class="tab-content">
+      <div class="card">
+        <div class="card-header flex-between">
+          <div>
+            <h2 class="card-title">Prompt Injection Scenario Catalog</h2>
+            <p class="card-subtitle">10 sandboxed enterprise environments with fake canary secrets and simulated tools.</p>
+          </div>
+          <div class="filter-pills" id="scenario-family-filters">
+            <button class="pill-btn active" onclick="filterScenarioGallery('all')">All Families</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scenario Cards Grid -->
+      <div id="scenarios-grid" class="scenarios-grid">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Expand Attempt Modal -->
+  <div id="detail-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-title" class="modal-title">Attack Attempt Details</h3>
+        <button class="modal-close-btn" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-meta-row" id="modal-meta"></div>
+
+        <div class="modal-section">
+          <label>Adversarial Injection Text:</label>
+          <pre id="modal-injection" class="modal-pre"></pre>
+        </div>
+
+        <div class="modal-section">
+          <label>Defender Response:</label>
+          <pre id="modal-response" class="modal-pre"></pre>
+        </div>
+
+        <div class="modal-section">
+          <label>Simulated Tool Calls:</label>
+          <pre id="modal-tools" class="modal-pre"></pre>
+        </div>
+
+        <div class="modal-section">
+          <label>Judge Determination:</label>
+          <div id="modal-reason" class="modal-reason-box"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Warning Confirmation Modal (Rate Limit Threshold) -->
+  <div id="warning-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-card" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 class="modal-title text-warning">⚠️ High Query Volume Confirmation</h3>
+        <button class="modal-close-btn" onclick="closeWarningModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: 1rem; color: #cbd5e1;">
+          This campaign is estimated to trigger <strong id="warning-call-count">48 queries</strong>, which exceeds the conservative threshold of 40 calls.
+        </p>
+        <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 1.5rem;">
+          In Mock Mode, no external quota is consumed. If running with a live Groq key, the built-in token-bucket rate limiter will automatically pace requests to 25 RPM.
+        </p>
+        <div class="action-row" style="justify-content: flex-end;">
+          <button class="btn btn-secondary" onclick="closeWarningModal()">Cancel</button>
+          <button class="btn btn-danger" onclick="confirmAndLaunchAutoCampaign()">Proceed Anyway</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- App Script -->
+  <script src="/static/app.js"></script>
+</body>
+</html>
